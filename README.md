@@ -43,6 +43,13 @@ Additionally, the server handles the activation of keys (redeem codes) to unlock
    * Privileges are determined by the game. Unlocking custom content via the server is not supported.
    * You need to reverse engineer the game to determine the privileges.
 
+## Important Notes
+
+- The server is designed to be used with a NAS server.
+- The NAS server must be configured to use the NAS token for authentication.
+- You MUST restrict `/admin` to be only accessible from your server IP address.
+- The server & the game will not function without any product and key configurations.
+
 ## License
 
 This project is governed by the terms outlined in [LICENSE.md](LICENSE.md).
