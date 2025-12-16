@@ -47,13 +47,19 @@ export default async (server: FastifyInstance) => {
       environment,
       gameCode,
       maxActivations,
-      json
+      json,
+      prefix,
     } = request.body as any;
+
+    // default the prefix
+    if (!prefix || prefix.length < 3) {
+      prefix = '000';
+    }
 
     try {
       // 🔑 Auto-generate if missing
       if (!keyCode) {
-        keyCode = generateRandomKey();
+        keyCode = generateRandomKey(prefix);
       }
 
       keyCode = keyCode.toUpperCase();

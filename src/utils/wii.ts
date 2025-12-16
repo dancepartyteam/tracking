@@ -44,9 +44,8 @@ export function isKeyValid(key: string): boolean {
   return pattern.test(key);
 }
 
-export function generateRandomKey(): string {
+export function generateRandomKey(prefix = "000"): string {
   const chars = '0123456789ABCDEFGHJKLMNPQRSTVWXY';
-  const prefix = '000';
   const parts = [prefix];
 
   for (let i = 0; i < 4; i++) {
