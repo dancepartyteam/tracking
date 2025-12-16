@@ -1,0 +1,10 @@
+.env
+!.env.example
+
+node_modules/
+logs/
+*.log
+
+macos-services.sh
+
+privilige-list.txt

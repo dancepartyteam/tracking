@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Products Management</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; 
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { 
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .actions {
+            margin: 20px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn:hover { background-color: #45a049; }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover { background-color: #5a6268; }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover { background-color: #c82333; }
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+            margin: 0 2px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .message {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            border-left: 4px solid;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .filter-form {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .filter-form > * {
+            display: inline-block;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Products Management</h1>
+        
+        <% if (message) { %>
+            <div class="message <%= messageType %>">
+                <%= message %>
+            </div>
+        <% } %>
+        
+        <div class="actions">
+            <a href="/admin/products/create" class="btn">+ Create New Product</a>
+        </div>
+        
+        <div class="filter-form">
+            <form method="GET" action="/admin/products">
+                <label>Environment:</label>
+                <select name="env" onchange="this.form.submit()">
+                    <option value="">All</option>
+                    <option value="dev" <%= filters.env === 'dev' ? 'selected' : '' %>>dev</option>
+                    <option value="uat" <%= filters.env === 'uat' ? 'selected' : '' %>>uat</option>
+                    <option value="prod" <%= filters.env === 'prod' ? 'selected' : '' %>>prod</option>
+                </select>
+                <input type="text" name="search" value="<%= filters.search || '' %>" placeholder="Search...">
+                <button type="submit" class="btn btn-small">Filter</button>
+                <a href="/admin/products" class="btn btn-small btn-secondary">Reset</a>
+            </form>
+        </div>
+        
+        <% if (products.length > 0) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Code</th>
+                        <th>Environment</th>
+                        <th>Password</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% products.forEach(product => { %>
+                    <tr>
+                        <td><%= product.name %></td>
+                        <td><code><%= product.code %></code></td>
+                        <td><strong><%= product.environment %></strong></td>
+                        <td><code><%= product.password %></code></td>
+                        <td>
+                            <a href="/admin/products/<%= product._id %>" class="btn btn-small btn-secondary">View</a>
+                            <a href="/admin/products/<%= product._id %>/edit" class="btn btn-small">Edit</a>
+                            <form method="POST" action="/admin/products/<%= product._id %>/delete" style="display:inline;" onsubmit="return confirm('Are you sure?');">
+                                <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p>No products found.</p>
+        <% } %>
+    </div>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Keys Management</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; 
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { 
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .actions {
+            margin: 20px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .btn:hover { background-color: #45a049; }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover { background-color: #5a6268; }
+        .btn-warning {
+            background-color: #ffc107;
+        }
+        .btn-warning:hover { background-color: #e0a800; }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover { background-color: #c82333; }
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+            margin: 0 2px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-available {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-activated {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .message {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            border-left: 4px solid;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .filter-form {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .filter-form > * {
+            display: inline-block;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Keys Management</h1>
+        
+        <% if (message) { %>
+            <div class="message <%= messageType %>">
+                <%= message %>
+            </div>
+        <% } %>
+        
+        <div class="actions">
+            <a href="/admin/keys/create" class="btn">+ Create Single Key</a>
+            <a href="/admin/keys/bulk-create" class="btn">+ Bulk Create Keys</a>
+            <a href="/admin/keys/export/csv?env=<%= filters.env || '' %>" class="btn btn-secondary">Export CSV</a>
+        </div>
+        
+        <div class="filter-form">
+            <form method="GET" action="/admin/keys">
+                <label>Environment:</label>
+                <select name="env" onchange="this.form.submit()">
+                    <option value="">All</option>
+                    <option value="dev" <%= filters.env === 'dev' ? 'selected' : '' %>>dev</option>
+                    <option value="uat" <%= filters.env === 'uat' ? 'selected' : '' %>>uat</option>
+                    <option value="prod" <%= filters.env === 'prod' ? 'selected' : '' %>>prod</option>
+                </select>
+                
+                <label>Status:</label>
+                <select name="status" onchange="this.form.submit()">
+                    <option value="">All</option>
+                    <option value="available" <%= filters.status === 'available' ? 'selected' : '' %>>Available</option>
+                    <option value="activated" <%= filters.status === 'activated' ? 'selected' : '' %>>Activated</option>
+                </select>
+                
+                <label>Game:</label>
+                <input type="text" name="gameCode" value="<%= filters.gameCode || '' %>" placeholder="Game code">
+                
+                <button type="submit" class="btn btn-small">Filter</button>
+                <a href="/admin/keys" class="btn btn-small btn-secondary">Reset</a>
+            </form>
+        </div>
+        
+        <% if (keys.length > 0) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Key Code</th>
+                        <th>Privilege</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Activations</th>
+                        <th>MAC Address</th>
+                        <th>Environment</th>
+                        <th>Game</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% keys.forEach(key => { %>
+                    <tr>
+                        <td><code><%= key.keyCode %></code></td>
+                        <td><%= key.privilegeList %></td>
+                        <td><%= key.privilegeName || '-' %></td>
+                        <td>
+                            <span class="status-badge <%= key.userMacAddress ? 'status-activated' : 'status-available' %>">
+                                <%= key.userMacAddress ? 'Activated' : 'Available' %>
+                            </span>
+                        </td>
+                        <td><%= key.activationCount %>/<%= key.maxActivations %></td>
+                        <td><code><%= key.userMacAddress || '-' %></code></td>
+                        <td><%= key.environment %></td>
+                        <td><%= key.gameCode || '-' %></td>
+                        <td>
+                            <a href="/admin/keys/<%= key._id %>" class="btn btn-small btn-secondary">View</a>
+                            <a href="/admin/keys/<%= key._id %>/edit" class="btn btn-small">Edit</a>
+                            <% if (key.userMacAddress) { %>
+                            <form method="POST" action="/admin/keys/<%= key._id %>/reset" style="display:inline;" onsubmit="return confirm('Reset this key?');">
+                                <button type="submit" class="btn btn-small btn-warning">Reset</button>
+                            </form>
+                            <% } %>
+                            <form method="POST" action="/admin/keys/<%= key._id %>/delete" style="display:inline;" onsubmit="return confirm('Delete this key?');">
+                                <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p>No keys found.</p>
+        <% } %>
+    </div>
+</body>
+</html>
