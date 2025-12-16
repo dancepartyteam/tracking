@@ -11,7 +11,7 @@ export function hashCrc32bDec(value: string): string {
     }
     return (crc ^ (-1)) >>> 0;
   };
-  
+
   // CRC32 lookup table
   const crcTable = (() => {
     const table = new Uint32Array(256);
@@ -24,7 +24,7 @@ export function hashCrc32bDec(value: string): string {
     }
     return table;
   })();
-  
+
   return crc32(value).toString();
 }
 
@@ -42,4 +42,20 @@ export function formatWiiResponse(data: Record<string, any>): string {
 export function isKeyValid(key: string): boolean {
   const pattern = /^[0-9A-Z]{3}-[0123456789ABCDEFGHJKLMNPQRSTVWXY]{4}-[0123456789ABCDEFGHJKLMNPQRSTVWXY]{4}-[0123456789ABCDEFGHJKLMNPQRSTVWXY]{4}-[0123456789ABCDEFGHJKLMNPQRSTVWXY]{4}$/;
   return pattern.test(key);
+}
+
+export function generateRandomKey(): string {
+  const chars = '0123456789ABCDEFGHJKLMNPQRSTVWXY';
+  const prefix = '000';
+  const parts = [prefix];
+
+  for (let i = 0; i < 4; i++) {
+    let part = '';
+    for (let j = 0; j < 4; j++) {
+      part += chars[Math.floor(Math.random() * chars.length)];
+    }
+    parts.push(part);
+  }
+
+  return parts.join('-');
 }
