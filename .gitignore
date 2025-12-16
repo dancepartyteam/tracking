@@ -8,3 +8,5 @@ logs/
 macos-services.sh
 
 privilige-list.txt
+
+package-lock.json

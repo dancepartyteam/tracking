@@ -6,11 +6,12 @@
  */
 
 import 'dotenv/config';
-import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
+import Fastify, { fastify, FastifyReply, FastifyRequest } from 'fastify';
 import formbody from '@fastify/formbody';
 import view from '@fastify/view';
 import ejs from 'ejs';
 import path from 'path';
+import ipaddr from "ipaddr.js";
 
 import { connectDB } from './config/database';
 import { TrackingError, ErrorCode } from './constants/errorCodes';
@@ -32,7 +33,11 @@ const logger = createLogger("tracking");
 
 const server = Fastify({
   // logger: isDev,
+  trustProxy: true
 });
+
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME ?? "admin";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "password";
 
 // Parse form data
 server.register(formbody);
@@ -58,6 +63,36 @@ server.decorateRequest('isJson', false);
 server.addHook('onRequest', (request, _reply, done) => {
   const query = request.query as any;
   request.isJson = query?.json === 'true';
+  done();
+});
+
+// Basic Auth for /admin
+server.addHook("onRequest", (request, reply, done) => {
+  if (request.url.startsWith("/admin")) {
+    // Basic Auth check
+    const authHeader = request.headers['authorization'];
+    if (!authHeader || !authHeader.startsWith("Basic ")) {
+      reply
+        .header("WWW-Authenticate", 'Basic realm="Admin Panel"')
+        .status(401)
+        .send();
+      return;
+    }
+
+    // Decode credentials
+    const base64Credentials = authHeader.split(" ")[1];
+    const credentials = Buffer.from(base64Credentials, "base64").toString("utf-8");
+    const [username, password] = credentials.split(":");
+
+    if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
+      reply
+        .header("WWW-Authenticate", 'Basic realm="Admin Panel"')
+        .status(401)
+        .send();
+      return;
+    }
+  }
+
   done();
 });
 
