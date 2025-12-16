@@ -11,7 +11,6 @@ import formbody from '@fastify/formbody';
 import view from '@fastify/view';
 import ejs from 'ejs';
 import path from 'path';
-import ipaddr from "ipaddr.js";
 
 import { connectDB } from './config/database';
 import { TrackingError, ErrorCode } from './constants/errorCodes';

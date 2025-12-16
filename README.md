@@ -47,7 +47,7 @@ Additionally, the server handles the activation of keys (redeem codes) to unlock
 
 - The server is designed to be used with a NAS server.
 - The NAS server must be configured to use the NAS token for authentication.
-- You MUST restrict `/admin` to be only accessible from your server IP address.
+- You MUST restrict `/admin` to be only accessible from your server IP address or set up the credentials in the `.env` file.
 - The server & the game will not function without any product and key configurations.
 
 ## License
